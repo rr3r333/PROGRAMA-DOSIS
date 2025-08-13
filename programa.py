@@ -33,7 +33,8 @@ st.markdown(
         border-radius: 5px;
         font-weight: bold;
         font-size: 14px;
-        width: 150px;
+        width: 100%;
+        height: 50px;
     }}
     .stButton>button:hover {{
         background-color: {COLOR_BOTON_HOVER};
@@ -49,6 +50,7 @@ st.markdown(
         box-sizing: border-box;
         margin-bottom: 15px;
         font-size: 18px;
+        height: 50px;
         outline: none !important;
     }}
     input[type="text"].error {{
@@ -94,7 +96,6 @@ def calcular():
     errores = []
     campos_error = []
 
-    # Validar peso
     try:
         peso = float(st.session_state.peso)
         if peso <= 0:
@@ -104,7 +105,6 @@ def calcular():
         errores.append("Peso debe ser un número válido.")
         campos_error.append("peso_input")
 
-    # Validar dosis
     try:
         dosis = float(st.session_state.dosis)
         if dosis <= 0:
@@ -114,7 +114,6 @@ def calcular():
         errores.append("Dosis debe ser un número válido.")
         campos_error.append("dosis_input")
 
-    # Validar concentración
     try:
         conc = float(st.session_state.conc)
         if conc <= 0:
@@ -129,15 +128,11 @@ def calcular():
     if errores:
         st.session_state.resultado = ""
     else:
-        resultado = (peso * dosis) / conc
-        st.session_state.resultado = resultado
+        st.session_state.resultado = (peso * dosis) / conc
 
     # Marcar inputs con error
     for key in ["peso_input", "dosis_input", "conc_input"]:
-        if key in campos_error:
-            st.session_state[key + "_class"] = "error"
-        else:
-            st.session_state[key + "_class"] = ""
+        st.session_state[key + "_class"] = "error" if key in campos_error else ""
 
 # Función para reiniciar todo
 def reiniciar():
@@ -150,9 +145,9 @@ peso_class = st.session_state.get("peso_input_class", "")
 dosis_class = st.session_state.get("dosis_input_class", "")
 conc_class = st.session_state.get("conc_input_class", "")
 
-st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input", placeholder="Ej: 12", help="", type="default")
-st.session_state.dosis = st.text_input("Dosis (mg/kg):", st.session_state.dosis, key="dosis_input", placeholder="Ej: 5")
-st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_state.conc, key="conc_input", placeholder="Ej: 10")
+st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input")
+st.session_state.dosis = st.text_input("Dosis (mg/kg):", st.session_state.dosis, key="dosis_input")
+st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_state.conc, key="conc_input")
 
 # Botones
 col1, col2 = st.columns(2)
