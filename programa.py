@@ -3,6 +3,7 @@ import streamlit as st
 # Colores
 COLOR_FONDO = "#F0F0F3"
 COLOR_TEXTO = "#222222"
+COLOR_INPUT_LABEL = "#000000"  # Letras de los labels en negro
 COLOR_INPUT_BG = "#FFFFFF"
 COLOR_INPUT_BORDER = "#CCCCCC"
 COLOR_INPUT_ERROR_BORDER = "#A10000"
@@ -23,6 +24,11 @@ st.markdown(f"""
     background-color: {COLOR_FONDO};
     color: {COLOR_TEXTO};
     font-family: 'Segoe UI', sans-serif;
+}}
+label {{
+    color: {COLOR_INPUT_LABEL} !important;
+    font-weight: bold;
+    font-size: 16px;
 }}
 .stButton>button {{
     background-color: {COLOR_BOTON};
@@ -158,7 +164,7 @@ if st.session_state.resultado != "":
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
 
-# JS para enfocar el primer input tras reinicio
+# JS para enfocar primer input tras reinicio
 if st.session_state.get("reiniciado"):
     st.markdown("""
     <script>
