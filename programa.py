@@ -45,7 +45,8 @@ label {{
 }}
 input[type="text"] {{
     background-color: {COLOR_INPUT_BG} !important;
-    color: {COLOR_TEXTO};
+    color: #000000; /* Texto dentro del input en negro */
+    caret-color: #000000; /* Cursor negro visible */
     border: 2px solid {COLOR_INPUT_BORDER};
     border-radius: 5px;
     padding: 12px 10px;
