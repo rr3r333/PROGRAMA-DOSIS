@@ -32,6 +32,7 @@ st.markdown(
         border-radius: 5px;
         font-weight: bold;
         font-size: 14px;
+        width: 150px;
     }}
     .stButton>button:hover {{
         background-color: {COLOR_BOTON_HOVER};
@@ -46,7 +47,7 @@ st.markdown(
         width: 100%;
         box-sizing: border-box;
         margin-bottom: 15px;
-        font-size: 16px;
+        font-size: 18px;
         outline: none !important;
     }}
     input[type="text"]:focus {{
@@ -61,7 +62,7 @@ st.markdown(
         font-weight: bold;
         text-align: center;
         margin-top: 15px;
-        font-size: 16px;
+        font-size: 18px;
     }}
     .error-box {{
         background-color: {COLOR_ERROR_BG};
@@ -70,7 +71,7 @@ st.markdown(
         border-radius: 5px;
         margin-top: 10px;
         margin-bottom: 10px;
-        font-size: 14px;
+        font-size: 16px;
     }}
     </style>
     """,
@@ -80,62 +81,75 @@ st.markdown(
 st.title("Calculadora de Dosis para Animales")
 
 # Inicializar session_state
-for key in ["peso", "dosis", "conc", "resultado"]:
-    if key not in st.session_state:
-        st.session_state[key] = ""
-
-# Función para reiniciar
-def reiniciar():
+if "peso" not in st.session_state:
     st.session_state.peso = ""
+if "dosis" not in st.session_state:
     st.session_state.dosis = ""
+if "conc" not in st.session_state:
     st.session_state.conc = ""
+if "resultado" not in st.session_state:
     st.session_state.resultado = ""
-    st.experimental_rerun()  # Recarga la app con inputs vacíos
 
 # Inputs grandes
 st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input")
 st.session_state.dosis = st.text_input("Dosis (mg/kg):", st.session_state.dosis, key="dosis_input")
 st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_state.conc, key="conc_input")
 
+# Función para calcular dosis
+def calcular():
+    errores = []
+    try:
+        peso = float(st.session_state.peso)
+        if peso <= 0:
+            errores.append("Peso debe ser mayor que cero.")
+    except:
+        errores.append("Peso debe ser un número válido.")
+
+    try:
+        dosis = float(st.session_state.dosis)
+        if dosis <= 0:
+            errores.append("Dosis debe ser mayor que cero.")
+    except:
+        errores.append("Dosis debe ser un número válido.")
+
+    try:
+        conc = float(st.session_state.conc)
+        if conc <= 0:
+            errores.append("Concentración debe ser mayor que cero.")
+    except:
+        errores.append("Concentración debe ser un número válido.")
+
+    if errores:
+        st.session_state.resultado = ""
+        st.session_state.errores = errores
+    else:
+        resultado = (peso * dosis) / conc
+        st.session_state.resultado = resultado
+        st.session_state.errores = []
+
+# Función para reiniciar inputs
+def reiniciar():
+    st.session_state.peso = ""
+    st.session_state.dosis = ""
+    st.session_state.conc = ""
+    st.session_state.resultado = ""
+    st.session_state.errores = []
+
 # Botones
 col1, col2 = st.columns(2)
-
 with col1:
     if st.button("Calcular Dosis"):
-        errores = []
-        try:
-            peso = float(st.session_state.peso)
-            if peso <= 0:
-                errores.append("Peso debe ser mayor que cero.")
-        except:
-            errores.append("Peso debe ser un número válido.")
-
-        try:
-            dosis = float(st.session_state.dosis)
-            if dosis <= 0:
-                errores.append("Dosis debe ser mayor que cero.")
-        except:
-            errores.append("Dosis debe ser un número válido.")
-
-        try:
-            conc = float(st.session_state.conc)
-            if conc <= 0:
-                errores.append("Concentración debe ser mayor que cero.")
-        except:
-            errores.append("Concentración debe ser un número válido.")
-
-        if errores:
-            for err in errores:
-                st.markdown(f'<div class="error-box">{err}</div>', unsafe_allow_html=True)
-        else:
-            resultado = (peso * dosis) / conc
-            st.session_state.resultado = resultado
-
+        calcular()
 with col2:
     if st.button("Reiniciar"):
-        reiniciar()  # Esta función limpia todo
+        reiniciar()
 
-# Mostrar resultado si existe
+# Mostrar errores
+if "errores" in st.session_state and st.session_state.errores:
+    for err in st.session_state.errores:
+        st.markdown(f'<div class="error-box">{err}</div>', unsafe_allow_html=True)
+
+# Mostrar resultado
 if st.session_state.resultado != "":
     st.markdown(f'<div class="resultado">Debe administrar: {st.session_state.resultado:.2f} ml</div>', unsafe_allow_html=True)
 
