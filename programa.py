@@ -4,14 +4,18 @@ import streamlit as st
 COLOR_FONDO = "#F0F0F3"
 COLOR_TEXTO = "#222222"
 COLOR_INPUT_BG = "#FFFFFF"
+COLOR_INPUT_BORDER = "#CCCCCC"
 COLOR_BOTON = "#4FA3C1"
+COLOR_BOTON_HOVER = "#3B8A9E"
 COLOR_RESULTADO_BG = "#D7F0FA"
 COLOR_RESULTADO_FG = "#1A5D73"
 COLOR_FOOTER = "#888888"
+COLOR_ERROR_BG = "#FFD6D6"
+COLOR_ERROR_FG = "#A10000"
 
 st.set_page_config(page_title="Calculadora de Dosis para Animales", page_icon="🐾", layout="centered")
 
-# Fondo personalizado usando CSS
+# Fondo personalizado y estilos CSS
 st.markdown(
     f"""
     <style>
@@ -29,25 +33,35 @@ st.markdown(
         font-weight: bold;
     }}
     .stButton>button:hover {{
-        background-color: #3B8A9E;
+        background-color: {COLOR_BOTON_HOVER};
         color: white;
     }}
-    .input-number input {{
-        background-color: {COLOR_INPUT_BG};
+    input[type="text"] {{
+        background-color: {COLOR_INPUT_BG} !important;
         color: {COLOR_TEXTO};
+        border: 2px solid {COLOR_INPUT_BORDER};
         border-radius: 5px;
-        padding: 5px 10px;
+        padding: 8px 10px;
         width: 100%;
         box-sizing: border-box;
+        margin-bottom: 10px;
     }}
     .resultado {{
         background-color: {COLOR_RESULTADO_BG};
         color: {COLOR_RESULTADO_FG};
-        padding: 10px;
+        padding: 12px;
         border-radius: 5px;
         font-weight: bold;
         text-align: center;
         margin-top: 15px;
+    }}
+    .error-box {{
+        background-color: {COLOR_ERROR_BG};
+        color: {COLOR_ERROR_FG};
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
     }}
     </style>
     """,
@@ -56,10 +70,10 @@ st.markdown(
 
 st.title("Calculadora de Dosis para Animales")
 
-# Inputs como texto para eliminar botones de más/menos
-peso_str = st.text_input("Peso del animal (kg):", "")
-dosis_str = st.text_input("Dosis (mg/kg):", "")
-conc_str = st.text_input("Concentración (mg/ml):", "")
+# Inicializar variables
+peso_str = st.text_input("Peso del animal (kg):", key="peso")
+dosis_str = st.text_input("Dosis (mg/kg):", key="dosis")
+conc_str = st.text_input("Concentración (mg/ml):", key="conc")
 
 # Botones
 col1, col2 = st.columns(2)
@@ -89,14 +103,15 @@ with col1:
             errores.append("Concentración debe ser un número válido.")
 
         if errores:
-            st.error("\n".join(errores))
+            for err in errores:
+                st.markdown(f'<div class="error-box">{err}</div>', unsafe_allow_html=True)
         else:
             resultado = (peso * dosis) / conc
             st.markdown(f'<div class="resultado">Debe administrar: {resultado:.2f} ml</div>', unsafe_allow_html=True)
 
 with col2:
     if st.button("Reiniciar"):
-        st.experimental_rerun()  # Esto reinicia la página entera y limpia los inputs
+        st.experimental_rerun()  # Esto recarga toda la app
 
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
