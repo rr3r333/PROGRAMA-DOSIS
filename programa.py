@@ -32,11 +32,13 @@ st.markdown(
         background-color: #3B8A9E;
         color: white;
     }}
-    .stNumberInput>div>input {{
+    .input-number input {{
         background-color: {COLOR_INPUT_BG};
         color: {COLOR_TEXTO};
         border-radius: 5px;
         padding: 5px 10px;
+        width: 100%;
+        box-sizing: border-box;
     }}
     .resultado {{
         background-color: {COLOR_RESULTADO_BG};
@@ -54,10 +56,10 @@ st.markdown(
 
 st.title("Calculadora de Dosis para Animales")
 
-# Inputs
-peso = st.number_input("Peso del animal (kg):", min_value=0.0, format="%.2f", step=0.1)
-dosis = st.number_input("Dosis (mg/kg):", min_value=0.0, format="%.2f", step=0.1)
-conc = st.number_input("Concentración (mg/ml):", min_value=0.0, format="%.2f", step=0.1)
+# Inputs como texto para eliminar botones de más/menos
+peso_str = st.text_input("Peso del animal (kg):", "")
+dosis_str = st.text_input("Dosis (mg/kg):", "")
+conc_str = st.text_input("Concentración (mg/ml):", "")
 
 # Botones
 col1, col2 = st.columns(2)
@@ -65,12 +67,26 @@ col1, col2 = st.columns(2)
 with col1:
     if st.button("Calcular Dosis"):
         errores = []
-        if peso <= 0:
-            errores.append("Peso debe ser mayor que cero.")
-        if dosis <= 0:
-            errores.append("Dosis debe ser mayor que cero.")
-        if conc <= 0:
-            errores.append("Concentración debe ser mayor que cero.")
+        try:
+            peso = float(peso_str)
+            if peso <= 0:
+                errores.append("Peso debe ser mayor que cero.")
+        except:
+            errores.append("Peso debe ser un número válido.")
+
+        try:
+            dosis = float(dosis_str)
+            if dosis <= 0:
+                errores.append("Dosis debe ser mayor que cero.")
+        except:
+            errores.append("Dosis debe ser un número válido.")
+
+        try:
+            conc = float(conc_str)
+            if conc <= 0:
+                errores.append("Concentración debe ser mayor que cero.")
+        except:
+            errores.append("Concentración debe ser un número válido.")
 
         if errores:
             st.error("\n".join(errores))
@@ -80,7 +96,8 @@ with col1:
 
 with col2:
     if st.button("Reiniciar"):
-        st.experimental_rerun()
+        st.experimental_rerun()  # Esto reinicia la página entera y limpia los inputs
 
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
+
