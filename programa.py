@@ -130,6 +130,7 @@ def reiniciar():
     for key in ["peso", "dosis", "conc", "resultado", "errores",
                 "peso_input_class", "dosis_input_class", "conc_input_class"]:
         st.session_state[key] = "" if "errores" not in key else []
+    st.session_state["reiniciado"] = True  # Marcador para JS
 
 # Inputs
 st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input")
@@ -157,10 +158,12 @@ if st.session_state.resultado != "":
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
 
-# JavaScript para enfocar primer input
-st.markdown("""
-<script>
-const firstInput = window.parent.document.querySelector('input[id="peso_input"]');
-if(firstInput){firstInput.focus();}
-</script>
-""", unsafe_allow_html=True)
+# JS para enfocar el primer input tras reinicio
+if st.session_state.get("reiniciado"):
+    st.markdown("""
+    <script>
+        const firstInput = window.parent.document.querySelector('input[id="peso_input"]');
+        if(firstInput){firstInput.focus();}
+    </script>
+    """, unsafe_allow_html=True)
+    st.session_state["reiniciado"] = False
