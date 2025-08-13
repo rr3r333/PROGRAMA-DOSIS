@@ -89,8 +89,10 @@ if "conc" not in st.session_state:
     st.session_state.conc = ""
 if "resultado" not in st.session_state:
     st.session_state.resultado = ""
+if "errores" not in st.session_state:
+    st.session_state.errores = []
 
-# Inputs grandes
+# Inputs
 st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input")
 st.session_state.dosis = st.text_input("Dosis (mg/kg):", st.session_state.dosis, key="dosis_input")
 st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_state.conc, key="conc_input")
@@ -98,6 +100,7 @@ st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_stat
 # Función para calcular dosis
 def calcular():
     errores = []
+    # Validar peso
     try:
         peso = float(st.session_state.peso)
         if peso <= 0:
@@ -105,6 +108,7 @@ def calcular():
     except:
         errores.append("Peso debe ser un número válido.")
 
+    # Validar dosis
     try:
         dosis = float(st.session_state.dosis)
         if dosis <= 0:
@@ -112,6 +116,7 @@ def calcular():
     except:
         errores.append("Dosis debe ser un número válido.")
 
+    # Validar concentración
     try:
         conc = float(st.session_state.conc)
         if conc <= 0:
@@ -127,13 +132,14 @@ def calcular():
         st.session_state.resultado = resultado
         st.session_state.errores = []
 
-# Función para reiniciar inputs
+# Función para reiniciar todo
 def reiniciar():
     st.session_state.peso = ""
     st.session_state.dosis = ""
     st.session_state.conc = ""
     st.session_state.resultado = ""
     st.session_state.errores = []
+    st.experimental_rerun()  # Fuerza la recarga de la app
 
 # Botones
 col1, col2 = st.columns(2)
@@ -145,7 +151,7 @@ with col2:
         reiniciar()
 
 # Mostrar errores
-if "errores" in st.session_state and st.session_state.errores:
+if st.session_state.errores:
     for err in st.session_state.errores:
         st.markdown(f'<div class="error-box">{err}</div>', unsafe_allow_html=True)
 
@@ -155,3 +161,4 @@ if st.session_state.resultado != "":
 
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
+
