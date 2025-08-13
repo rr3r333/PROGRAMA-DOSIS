@@ -5,6 +5,7 @@ COLOR_FONDO = "#F0F0F3"
 COLOR_TEXTO = "#222222"
 COLOR_INPUT_BG = "#FFFFFF"
 COLOR_INPUT_BORDER = "#CCCCCC"
+COLOR_INPUT_ERROR_BORDER = "#A10000"
 COLOR_BOTON = "#4FA3C1"
 COLOR_BOTON_HOVER = "#3B8A9E"
 COLOR_RESULTADO_BG = "#D7F0FA"
@@ -50,6 +51,9 @@ st.markdown(
         font-size: 18px;
         outline: none !important;
     }}
+    input[type="text"].error {{
+        border: 2px solid {COLOR_INPUT_ERROR_BORDER} !important;
+    }}
     input[type="text"]:focus {{
         border: 2px solid {COLOR_BOTON_HOVER} !important;
         box-shadow: none !important;
@@ -81,65 +85,74 @@ st.markdown(
 st.title("Calculadora de Dosis para Animales")
 
 # Inicializar session_state
-if "peso" not in st.session_state:
-    st.session_state.peso = ""
-if "dosis" not in st.session_state:
-    st.session_state.dosis = ""
-if "conc" not in st.session_state:
-    st.session_state.conc = ""
-if "resultado" not in st.session_state:
-    st.session_state.resultado = ""
-if "errores" not in st.session_state:
-    st.session_state.errores = []
-
-# Inputs
-st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input")
-st.session_state.dosis = st.text_input("Dosis (mg/kg):", st.session_state.dosis, key="dosis_input")
-st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_state.conc, key="conc_input")
+for key in ["peso", "dosis", "conc", "resultado", "errores"]:
+    if key not in st.session_state:
+        st.session_state[key] = "" if key != "errores" else []
 
 # Función para calcular dosis
 def calcular():
     errores = []
+    campos_error = []
+
     # Validar peso
     try:
         peso = float(st.session_state.peso)
         if peso <= 0:
             errores.append("Peso debe ser mayor que cero.")
+            campos_error.append("peso_input")
     except:
         errores.append("Peso debe ser un número válido.")
+        campos_error.append("peso_input")
 
     # Validar dosis
     try:
         dosis = float(st.session_state.dosis)
         if dosis <= 0:
             errores.append("Dosis debe ser mayor que cero.")
+            campos_error.append("dosis_input")
     except:
         errores.append("Dosis debe ser un número válido.")
+        campos_error.append("dosis_input")
 
     # Validar concentración
     try:
         conc = float(st.session_state.conc)
         if conc <= 0:
             errores.append("Concentración debe ser mayor que cero.")
+            campos_error.append("conc_input")
     except:
         errores.append("Concentración debe ser un número válido.")
+        campos_error.append("conc_input")
+
+    st.session_state.errores = errores
 
     if errores:
         st.session_state.resultado = ""
-        st.session_state.errores = errores
     else:
         resultado = (peso * dosis) / conc
         st.session_state.resultado = resultado
-        st.session_state.errores = []
+
+    # Marcar inputs con error
+    for key in ["peso_input", "dosis_input", "conc_input"]:
+        if key in campos_error:
+            st.session_state[key + "_class"] = "error"
+        else:
+            st.session_state[key + "_class"] = ""
 
 # Función para reiniciar todo
 def reiniciar():
-    st.session_state.peso = ""
-    st.session_state.dosis = ""
-    st.session_state.conc = ""
-    st.session_state.resultado = ""
-    st.session_state.errores = []
-    st.experimental_rerun()  # Fuerza la recarga de la app
+    for key in ["peso", "dosis", "conc", "resultado", "errores",
+                "peso_input_class", "dosis_input_class", "conc_input_class"]:
+        st.session_state[key] = "" if "errores" not in key else []
+
+# Inputs con clases de error
+peso_class = st.session_state.get("peso_input_class", "")
+dosis_class = st.session_state.get("dosis_input_class", "")
+conc_class = st.session_state.get("conc_input_class", "")
+
+st.session_state.peso = st.text_input("Peso del animal (kg):", st.session_state.peso, key="peso_input", placeholder="Ej: 12", help="", type="default")
+st.session_state.dosis = st.text_input("Dosis (mg/kg):", st.session_state.dosis, key="dosis_input", placeholder="Ej: 5")
+st.session_state.conc = st.text_input("Concentración (mg/ml):", st.session_state.conc, key="conc_input", placeholder="Ej: 10")
 
 # Botones
 col1, col2 = st.columns(2)
@@ -161,4 +174,3 @@ if st.session_state.resultado != "":
 
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
-
