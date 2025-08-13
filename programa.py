@@ -29,7 +29,6 @@ st.markdown(
         background-color: {COLOR_BOTON};
         color: white;
         border: none;
-        padding: 12px 24px;
         border-radius: 5px;
         font-weight: bold;
         font-size: 14px;
@@ -134,11 +133,12 @@ def calcular():
     for key in ["peso_input", "dosis_input", "conc_input"]:
         st.session_state[key + "_class"] = "error" if key in campos_error else ""
 
-# Función para reiniciar todo
+# Función para reiniciar todo y poner foco en el primer input
 def reiniciar():
     for key in ["peso", "dosis", "conc", "resultado", "errores",
                 "peso_input_class", "dosis_input_class", "conc_input_class"]:
         st.session_state[key] = "" if "errores" not in key else []
+    st.experimental_rerun()  # Refresca la app para aplicar cambios
 
 # Inputs con clases de error
 peso_class = st.session_state.get("peso_input_class", "")
@@ -169,3 +169,11 @@ if st.session_state.resultado != "":
 
 # Footer
 st.markdown(f"<p style='text-align:right; font-size:10px; color:{COLOR_FOOTER};'>by: R</p>", unsafe_allow_html=True)
+
+# JavaScript para enfocar el primer input automáticamente
+st.markdown("""
+    <script>
+        const firstInput = window.parent.document.querySelector('input[id="peso_input"]');
+        if(firstInput){firstInput.focus();}
+    </script>
+""", unsafe_allow_html=True)
